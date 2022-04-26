@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Place Searches</title>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+    <style>
+      /* Always set the map height explicitly to define the size of the div
+       * element that contains the map. */
+      #map {
+      height: 300px;
+    width: 400px; 
+      }
+      /* Optional: Makes the sample page fill the window. */
+      html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+	
+	  .gm-fullscreen-control {
+		width: 23px !important;
+		height: 23px !important;
+		right: -6px !important;
+	}
+	  #map .gm-style .controls.zoom-control {
+			display: flex;
+			flex-direction: column;
+			height: 200px;
+			
+	}
+   
+	#map .gm-bundled-control-on-bottom {
+		right: 20px !important;
+		bottom: 116px !important;
+	}
+
+	#map .gm-bundled-control-on-bottom > div:first-child {
+		top: 44px !important;
+		height:10px !important;
+	}
+
+	#map .gmnoprint > .gmnoprint > div {
+		height: 60px !important;
+		width: 26px !important;
+	}
+	#map .gmnoprint > .gmnoprint > div > div { /* seperator */
+		width: 50px !important;
+		margin: 0px 3.75px !important;
+	}
+	#map .gmnoprint > .gmnoprint button {
+		width: 30px !important;
+		height: 30px !important;
+	}
+	#map .gmnoprint > .gmnoprint button img {
+		height: 13.5px !important;
+		width: 13.5px !important;
+		margin: 0px -2px 9.75px !important;
+	}
+
+
+    </style>
+    <script>
+      // This example requires the Places library. Include the libraries=places
+      // parameter when you first load the API. For example:
+      // <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places">
+
+      var map;
+      var service;
+      var infowindow;
+	  var marker;
+
+      function initMap() {
+        var sydney = new google.maps.LatLng(-33.867, 151.195);
+
+        infowindow = new google.maps.InfoWindow({maxWidth: 200 ,
+        maxHeight: 400});
+		
+        
+
+        map = new google.maps.Map(
+            document.getElementById('map'), {center: "", zoom: 15, disableDefaultUI: true,zoomControl: true, fullscreenControl: true,scrollwheel: true,
+			 styles: [
+            {elementType: 'geometry', stylers: [{color: '#242f3e'}]},
+            {elementType: 'labels.text.stroke', stylers: [{color: '#242f3e'}]},
+            {elementType: 'labels.text.fill', stylers: [{color: '#746855'}]},
+            {
+              featureType: 'administrative.locality',
+              elementType: 'labels.text.fill',
+              stylers: [{color: '#d59563'}]
+            },
+            {
+              featureType: 'poi',
+              elementType: 'labels.text.fill',
+              stylers: [{color: '#d59563'}]
+            },
+            {
+              featureType: 'poi.park',
+              elementType: 'geometry',
+              stylers: [{color: '#263c3f'}]
+            },
+            {
+              featureType: 'poi.park',
+              elementType: 'labels.text.fill',
+              stylers: [{color: '#6b9a76'}]
+            },
+            {
+              featureType: 'road',
+              elementType: 'geometry',
+              stylers: [{color: '#38414e'}]
+            },
+            {
+              featureType: 'road',
+              elementType: 'geometry.stroke',
+              stylers: [{color: '#212a37'}]
+            },
+            {
+              featureType: 'road',
+              elementType: 'labels.text.fill',
+              stylers: [{color: '#9ca5b3'}]
+            },
+            {
+              featureType: 'road.highway',
+              elementType: 'geometry',
+              stylers: [{color: '#746855'}]
+            },
+            {
+              featureType: 'road.highway',
+              elementType: 'geometry.stroke',
+              stylers: [{color: '#1f2835'}]
+            },
+            {
+              featureType: 'road.highway',
+              elementType: 'labels.text.fill',
+              stylers: [{color: '#f3d19c'}]
+            },
+            {
+              featureType: 'transit',
+              elementType: 'geometry',
+              stylers: [{color: '#2f3948'}]
+            },
+            {
+              featureType: 'transit.station',
+              elementType: 'labels.text.fill',
+              stylers: [{color: '#d59563'}]
+            },
+            {
+              featureType: 'water',
+              elementType: 'geometry',
+              stylers: [{color: '#17263c'}]
+            },
+            {
+              featureType: 'water',
+              elementType: 'labels.text.fill',
+              stylers: [{color: '#515c6d'}]
+            },
+            {
+              featureType: 'water',
+              elementType: 'labels.text.stroke',
+              stylers: [{color: '#17263c'}]
+            }
+          ]});
+		var address = 'Xiaomi Zongcan, Haidian District, Beijing, China'
+        var request = {
+          query: address,
+          fields: ['name', 'geometry'],
+        };
+
+        service = new google.maps.places.PlacesService(map);
+
+        service.findPlaceFromQuery(request, function(results, status) {
+          if (status === google.maps.places.PlacesServiceStatus.OK) {
+            for (var i = 0; i < results.length; i++) {
+              createMarker(results[i],address);
+            }
+
+            map.setCenter(results[0].geometry.location);
+          }
+        });
+      }
+
+      function createMarker(place,address) {
+        var marker = new google.maps.Marker({
+          map: map,
+          position: place.geometry.location
+        });
+		
+		addYourLocationButton(map,marker);
+       
+		infowindow.setContent(address);
+         infowindow.open(map, marker);
+      }
+	  
+	  	  
+function addYourLocationButton(map, marker) 
+{
+    var controlDiv = document.createElement('div');
+
+    var firstChild = document.createElement('button');
+    firstChild.style.backgroundColor = '#fff';
+    firstChild.style.border = 'none';
+    firstChild.style.outline = 'none';
+    firstChild.style.width = '25px';
+    firstChild.style.height = '24px';
+    firstChild.style.borderRadius = '2px';
+    firstChild.style.boxShadow = '0 1px 4px rgba(0,0,0,0.3)';
+    firstChild.style.cursor = 'pointer';
+    firstChild.style.marginRight = '4px';
+    firstChild.style.padding = '0px';
+    firstChild.title = 'Your Location';
+    controlDiv.appendChild(firstChild);
+
+    var secondChild = document.createElement('div');
+    secondChild.style.margin = '3px';
+    secondChild.style.width = '18px';
+    secondChild.style.height = '18px';
+    secondChild.style.backgroundImage = 'url(https://maps.gstatic.com/tactile/mylocation/mylocation-sprite-1x.png)';
+    secondChild.style.backgroundSize = '180px 18px';
+    secondChild.style.backgroundPosition = '0px 0px';
+    secondChild.style.backgroundRepeat = 'no-repeat';
+    secondChild.id = 'you_location_img';
+    firstChild.appendChild(secondChild);
+
+  
+    firstChild.addEventListener('click', function() {
+        var imgX = '0';
+        var animationInterval = setInterval(function(){
+            if(imgX == '-18') imgX = '0';
+            else imgX = '-18';
+            $('#you_location_img').css('background-position', imgX+'px 0px');
+        }, 500);
+        if(navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(function(position) {
+                var latlng = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+                 var geocoder = new google.maps.Geocoder;
+				
+         geocoder.geocode({'location': latlng}, function(results, status) {
+		if (status === 'OK') {
+            if (results[0]) {
+              infowindow.setContent(results[0].formatted_address);
+              infowindow.open(map, marker);
+			  marker.setPosition(latlng);
+              map.setCenter(latlng);
+			 
+            } 
+          } 
+		});
+
+         $('#you_location_img').css('background-position', '-144px 0px');
+				
+            });
+        }
+        else{
+            clearInterval(animationInterval);
+            $('#you_location_img').css('background-position', '0px 0px');
+        }
+    });
+
+    controlDiv.index = 1;
+    map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(controlDiv);
+}
+
+    </script>
+  </head>
+  <body>
+    <div id="map" style="margin-left: 406px;"></div>
+	<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCyuLfCzbDyeWuIlhbVGTwpcal4HKoI52g&libraries=places&callback=initMap" async defer></script>
+
+  </body>
+</html>
